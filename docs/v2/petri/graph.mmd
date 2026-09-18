@@ -1,0 +1,178 @@
+flowchart LR
+  classDef place fill:#1e293b,color:#e2e8f0,stroke:#475569;
+  classDef fault fill:#7f1d1d,color:#fee2e2,stroke:#ef4444;
+  classDef dimCode fill:#1e3a8a,color:#dbeafe,stroke:#3b82f6;
+  classDef dimData fill:#064e3b,color:#d1fae5,stroke:#10b981;
+  classDef dimSec fill:#78350f,color:#fef3c7,stroke:#f59e0b;
+  classDef dimUx fill:#4c1d95,color:#ede9fe,stroke:#8b5cf6;
+  classDef dimOps fill:#334155,color:#f1f5f9,stroke:#94a3b8;
+  classDef dimProd fill:#831843,color:#fce7f3,stroke:#ec4899;
+  subgraph _0 ["Ω0 · Kalibrierungs-Fabric existiert"]
+    P_yaml_schema(("P_yaml_schema")):::place
+    P_runner(("P_runner")):::place
+    P_snapshotter(("P_snapshotter")):::place
+    P_graph_mmd(("P_graph_mmd")):::place
+    P_admin_view(("P_admin_view")):::place
+    P_baseline_metrics(("P_baseline_metrics")):::place
+    P_ci_blocks_on_missing_proof(("P_ci_blocks_on_missing_proof")):::place
+    P_petri_ready(("P_petri_ready")):::place
+    P_missing_proof(("⊘ P_missing_proof")):::fault
+    T0_1["T0.1 · Spec-Engine (Zod-Schema + Runner + Snapshotter)"]:::dimOps
+    T0_1 --> P_yaml_schema
+    T0_1 --> P_runner
+    T0_1 --> P_snapshotter
+    T0_2["T0.2 · Graph-Renderer + Admin-Ansicht"]:::dimUx
+    P_yaml_schema --> T0_2
+    T0_2 --> P_graph_mmd
+    T0_2 --> P_admin_view
+    T0_3["T0.3 · Baseline-Metriken erfassen"]:::dimOps
+    P_runner --> T0_3
+    T0_3 --> P_baseline_metrics
+    T0_4["T0.4 · CI-Gate"]:::dimOps
+    P_runner --> T0_4
+    P_baseline_metrics --> T0_4
+    T0_4 --> P_ci_blocks_on_missing_proof
+    T0_4 --> P_petri_ready
+    T0_4 -.-> P_missing_proof
+    T0_R -.compensate.-> T0_4
+    T0_R["T0_R · Fehlende Proofs melden und blockieren"]:::dimOps
+  end
+  subgraph _1 ["Ω1 · Foundation: Actor-ID, Session-Runtime, Baseline-Collectors"]
+    P_actor_id_primitive(("P_actor_id_primitive")):::place
+    P_actor_id_hook(("P_actor_id_hook")):::place
+    P_session_runtime_stable(("P_session_runtime_stable")):::place
+    P_baseline_collectors_live(("P_baseline_collectors_live")):::place
+    P_foundation_ready(("P_foundation_ready")):::place
+    P_session_hang(("⊘ P_session_hang")):::fault
+    P_missing_actor(("⊘ P_missing_actor")):::fault
+    T1_1["T1.1 · Actor-ID Primitive (device + user)"]:::dimCode
+    P_petri_ready --> T1_1
+    T1_1 --> P_actor_id_primitive
+    T1_1 -.-> P_missing_actor
+    T1_2["T1.2 · React-Hook useActorId()"]:::dimCode
+    P_actor_id_primitive --> T1_2
+    T1_2 --> P_actor_id_hook
+    T1_3["T1.3 · Session-Runtime-Fix (Black-Screen root cause)"]:::dimUx
+    P_petri_ready --> T1_3
+    T1_3 --> P_session_runtime_stable
+    T1_3 -.-> P_session_hang
+    T1_R -.compensate.-> T1_3
+    T1_4["T1.4 · Baseline-Collectors verdrahten"]:::dimOps
+    P_baseline_metrics --> T1_4
+    T1_4 --> P_baseline_collectors_live
+    T1_5["T1.5 · Foundation-Gate schließt"]:::dimOps
+    P_actor_id_primitive --> T1_5
+    P_actor_id_hook --> T1_5
+    P_session_runtime_stable --> T1_5
+    P_baseline_collectors_live --> T1_5
+    T1_5 --> P_foundation_ready
+    T1_R["T1_R · Session-Hang Kompensation"]:::dimUx
+  end
+  subgraph _2 ["Ω2 · Actors · Teams · Spaces (Tenancy + RLS)"]
+    P_actor_registry(("P_actor_registry")):::place
+    P_api_key_flow(("P_api_key_flow")):::place
+    P_team_membership(("P_team_membership")):::place
+    P_scoped_visibility(("P_scoped_visibility")):::place
+    P_zero_trust_reads(("P_zero_trust_reads")):::place
+    P_multitenant_backfilled(("P_multitenant_backfilled")):::place
+    P_ux_space_context(("P_ux_space_context")):::place
+    P_seat_billing(("P_seat_billing")):::place
+    P_immutable_audit(("P_immutable_audit")):::place
+    P_tenancy_observed(("P_tenancy_observed")):::place
+    P_tenancy_ready(("P_tenancy_ready")):::place
+    P_orphan_actor(("⊘ P_orphan_actor")):::fault
+    P_leaked_secret(("⊘ P_leaked_secret")):::fault
+    P_over_grant(("⊘ P_over_grant")):::fault
+    P_missing_matrix_row(("⊘ P_missing_matrix_row")):::fault
+    P_null_tenant_rows(("⊘ P_null_tenant_rows")):::fault
+    P_seat_desync(("⊘ P_seat_desync")):::fault
+    P_regression_signal(("⊘ P_regression_signal")):::fault
+    P_policy_gap(("⊘ P_policy_gap")):::fault
+    T2_1["T2.1 · actors registry (human/llm/service parity)"]:::dimData
+    P_foundation_ready --> T2_1
+    T2_1 --> P_actor_registry
+    T2_1 -.-> P_orphan_actor
+    T2_R1 -.compensate.-> T2_1
+    T2_2["T2.2 · actor_credentials (rotatable API keys)"]:::dimSec
+    P_actor_registry --> T2_2
+    T2_2 --> P_api_key_flow
+    T2_2 -.-> P_leaked_secret
+    T2_R2 -.compensate.-> T2_2
+    T2_3["T2.3 · teams + team_members with role matrix"]:::dimData
+    P_actor_registry --> T2_3
+    T2_3 --> P_team_membership
+    T2_4["T2.4 · spaces + space_access with visibility semantics"]:::dimData
+    P_team_membership --> T2_4
+    T2_4 --> P_scoped_visibility
+    T2_4 -.-> P_over_grant
+    T2_R3 -.compensate.-> T2_4
+    T2_5["T2.5 · RLS matrix engine (composite: contract + runtime + snapshot + gate)"]:::dimSec
+    P_scoped_visibility --> T2_5
+    T2_5 --> P_zero_trust_reads
+    T2_5 -.-> P_missing_matrix_row
+    T2_5 -.-> P_policy_gap
+    T2_R4 -.compensate.-> T2_5
+    T2_5_R1 -.compensate.-> T2_5
+    T2_5_a["T2.5.a · RLS schema contract (static invariants)"]:::dimSec
+    P_scoped_visibility --> T2_5_a
+    T2_5_a --> P_zero_trust_reads
+    T2_5_a -.-> P_policy_gap
+    T2_5_R1 -.compensate.-> T2_5_a
+    T2_5_R1["T2.5_R1 · add missing policy on gap"]:::dimSec
+    P_policy_gap --> T2_5_R1
+    T2_5_R1 --> P_zero_trust_reads
+    T2_6["T2.6 · tenant backfill (nullable → not null)"]:::dimData
+    P_scoped_visibility --> T2_6
+    T2_6 --> P_multitenant_backfilled
+    T2_6 -.-> P_null_tenant_rows
+    T2_R5 -.compensate.-> T2_6
+    T2_7["T2.7 · SpaceSwitcher UX + queryKeys space segment"]:::dimUx
+    P_scoped_visibility --> T2_7
+    T2_7 --> P_ux_space_context
+    T2_8["T2.8 · Pricing v2 seat billing (Stripe)"]:::dimProd
+    P_team_membership --> T2_8
+    T2_8 --> P_seat_billing
+    T2_8 -.-> P_seat_desync
+    T2_R6 -.compensate.-> T2_8
+    T2_9["T2.9 · audit_log (append-only)"]:::dimSec
+    P_actor_registry --> T2_9
+    T2_9 --> P_immutable_audit
+    T2_10["T2.10 · PostHog tenancy observability"]:::dimOps
+    P_scoped_visibility --> T2_10
+    T2_10 --> P_tenancy_observed
+    T2_11["T2.11 · Ω2 gate closes"]:::dimOps
+    P_actor_registry --> T2_11
+    P_api_key_flow --> T2_11
+    P_team_membership --> T2_11
+    P_scoped_visibility --> T2_11
+    P_zero_trust_reads --> T2_11
+    P_multitenant_backfilled --> T2_11
+    P_ux_space_context --> T2_11
+    P_seat_billing --> T2_11
+    P_immutable_audit --> T2_11
+    P_tenancy_observed --> T2_11
+    T2_11 --> P_tenancy_ready
+    T2_R1["T2_R1 · relink orphan actor"]:::dimData
+    P_orphan_actor --> T2_R1
+    T2_R1 --> P_actor_registry
+    T2_R2["T2_R2 · rotate and notify on leaked secret"]:::dimSec
+    P_leaked_secret --> T2_R2
+    T2_R2 --> P_api_key_flow
+    T2_R3["T2_R3 · revoke over-grant and recalc"]:::dimSec
+    P_over_grant --> T2_R3
+    T2_R3 --> P_scoped_visibility
+    T2_R4["T2_R4 · CI blocks merge without matrix row"]:::dimOps
+    P_missing_matrix_row --> T2_R4
+    T2_R4 --> P_zero_trust_reads
+    T2_R5["T2_R5 · quarantine unassigned rows"]:::dimData
+    P_null_tenant_rows --> T2_R5
+    T2_R5 --> P_multitenant_backfilled
+    T2_R6["T2_R6 · stripe seat reconciliation"]:::dimProd
+    P_seat_desync --> T2_R6
+    T2_R6 --> P_seat_billing
+    T2_R7["T2_R7 · investigate regression signal"]:::dimOps
+    P_regression_signal --> T2_R7
+    T2_R7 --> P_tenancy_observed
+  end
+  P_petri_ready ==> _1
+  P_foundation_ready ==> _2

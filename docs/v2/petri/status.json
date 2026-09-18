@@ -1,0 +1,716 @@
+{
+  "generatedAt": "2026-08-01T19:56:13.342Z",
+  "phases": {
+    "Ω0": {
+      "title": "Kalibrierungs-Fabric existiert",
+      "complete": true,
+      "goalPlace": "P_petri_ready",
+      "goalFired": true,
+      "faultsOpen": false,
+      "tokens": {
+        "P_yaml_schema": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.1",
+              "state": "fired",
+              "refs": [
+                "test:petri/verify runs against empty inventory without error",
+                "manual:schema.ts existiert und validiert phases/omega-0.json"
+              ]
+            }
+          ]
+        },
+        "P_runner": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.1",
+              "state": "fired",
+              "refs": [
+                "test:petri/verify runs against empty inventory without error",
+                "manual:schema.ts existiert und validiert phases/omega-0.json"
+              ]
+            }
+          ]
+        },
+        "P_snapshotter": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.1",
+              "state": "fired",
+              "refs": [
+                "test:petri/verify runs against empty inventory without error",
+                "manual:schema.ts existiert und validiert phases/omega-0.json"
+              ]
+            }
+          ]
+        },
+        "P_graph_mmd": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.2",
+              "state": "fired",
+              "refs": [
+                "manual:graph.mmd existiert und enthält alle Places/Transitions",
+                "flow:admin_petri_page_loads"
+              ]
+            }
+          ]
+        },
+        "P_admin_view": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.2",
+              "state": "fired",
+              "refs": [
+                "manual:graph.mmd existiert und enthält alle Places/Transitions",
+                "flow:admin_petri_page_loads"
+              ]
+            }
+          ]
+        },
+        "P_baseline_metrics": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.3",
+              "state": "attested",
+              "refs": [
+                "manual:snapshots/baseline.json existiert und hat Zeitstempel"
+              ]
+            }
+          ]
+        },
+        "P_ci_blocks_on_missing_proof": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.4",
+              "state": "fired",
+              "refs": [
+                "test:verify --dry-fault exits non-zero"
+              ]
+            }
+          ]
+        },
+        "P_petri_ready": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T0.4",
+              "state": "fired",
+              "refs": [
+                "test:verify --dry-fault exits non-zero"
+              ]
+            }
+          ]
+        },
+        "P_missing_proof": {
+          "fired": false,
+          "faultPlace": true
+        }
+      }
+    },
+    "Ω1": {
+      "title": "Foundation: Actor-ID, Session-Runtime, Baseline-Collectors",
+      "complete": true,
+      "goalPlace": "P_foundation_ready",
+      "goalFired": true,
+      "faultsOpen": false,
+      "tokens": {
+        "P_actor_id_primitive": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T1.1",
+              "state": "fired",
+              "refs": [
+                "test:src/lib/actor/__tests__/actorId.test.ts",
+                "manual:device id persisted under synapse.actor.device.v1"
+              ]
+            }
+          ]
+        },
+        "P_actor_id_hook": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T1.2",
+              "state": "attested",
+              "refs": [
+                "manual:hook file exists and re-exports composeActorId semantics"
+              ]
+            }
+          ]
+        },
+        "P_session_runtime_stable": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T1.3",
+              "state": "fired",
+              "refs": [
+                "flow:auth_loading_resolves_within_4s",
+                "manual:tab-suspend → resume triggers session refresh"
+              ]
+            }
+          ]
+        },
+        "P_baseline_collectors_live": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T1.4",
+              "state": "fired",
+              "refs": [
+                "metric:baseline.bundle.totalKb",
+                "metric:baseline.edgeFunctions.count"
+              ]
+            }
+          ]
+        },
+        "P_foundation_ready": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T1.5",
+              "state": "fired",
+              "refs": [
+                "test:scripts/petri/verify.mjs --phase Ω1 exit 0"
+              ]
+            }
+          ]
+        },
+        "P_session_hang": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_missing_actor": {
+          "fired": false,
+          "faultPlace": true
+        }
+      }
+    },
+    "Ω2": {
+      "title": "Actors · Teams · Spaces (Tenancy + RLS)",
+      "complete": true,
+      "goalPlace": "P_tenancy_ready",
+      "goalFired": true,
+      "faultsOpen": false,
+      "tokens": {
+        "P_actor_registry": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.1",
+              "state": "fired",
+              "refs": [
+                "manual:migration:actors_backbone",
+                "test:tenancy/actors.rls.spec"
+              ]
+            },
+            {
+              "transition": "T2_R1",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:relink_actor"
+              ]
+            }
+          ]
+        },
+        "P_api_key_flow": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.2",
+              "state": "fired",
+              "refs": [
+                "manual:migration:actor_credentials",
+                "flow:flow:issue_use_rotate_key"
+              ]
+            },
+            {
+              "transition": "T2_R2",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:rotate_credentials"
+              ]
+            }
+          ]
+        },
+        "P_team_membership": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.3",
+              "state": "fired",
+              "refs": [
+                "manual:migration:teams_members",
+                "test:tenancy/teams.membership.spec"
+              ]
+            }
+          ]
+        },
+        "P_scoped_visibility": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.4",
+              "state": "fired",
+              "refs": [
+                "manual:migration:spaces_access",
+                "test:tenancy/space_access.matrix.spec"
+              ]
+            },
+            {
+              "transition": "T2_R3",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:revoke_over_grant"
+              ]
+            }
+          ]
+        },
+        "P_zero_trust_reads": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.5",
+              "state": "fired",
+              "refs": [
+                "test:rls/schema.contract"
+              ]
+            },
+            {
+              "transition": "T2.5.a",
+              "state": "fired",
+              "refs": [
+                "test:rls/schema.contract",
+                "manual:snapshot:docs/v2/petri/snapshots/rls-contract.latest.json"
+              ]
+            },
+            {
+              "transition": "T2.5_R1",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:close_policy_gap"
+              ]
+            },
+            {
+              "transition": "T2_R4",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:ci_matrix_gate"
+              ]
+            }
+          ]
+        },
+        "P_multitenant_backfilled": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.6",
+              "state": "fired",
+              "refs": [
+                "metric:null_tenant_rows",
+                "manual:migration:tenant_backfill_v1"
+              ]
+            },
+            {
+              "transition": "T2.6.a",
+              "state": "fired",
+              "refs": [
+                "metric:profiles_without_actor"
+              ]
+            },
+            {
+              "transition": "T2.6.b",
+              "state": "fired",
+              "refs": [
+                "manual:function:ensure_personal_space",
+                "metric:personal_spaces_seeded"
+              ]
+            },
+            {
+              "transition": "T2.6.c",
+              "state": "fired",
+              "refs": [
+                "metric:null_tenant_rows_after"
+              ]
+            },
+            {
+              "transition": "T2.6.d",
+              "state": "attested",
+              "refs": [
+                "manual:migration:tenant_backfill_not_null"
+              ]
+            },
+            {
+              "transition": "T2.6.e",
+              "state": "fired",
+              "refs": [
+                "test:rls/matrix.postbackfill"
+              ]
+            },
+            {
+              "transition": "T2_R5",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:quarantine_unassigned"
+              ]
+            }
+          ]
+        },
+        "P_ux_space_context": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.7",
+              "state": "fired",
+              "refs": [
+                "flow:flow:switch_space_data_isolates",
+                "test:tenancy/queryKeys.space.spec"
+              ]
+            }
+          ]
+        },
+        "P_seat_billing": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.8",
+              "state": "fired",
+              "refs": [
+                "flow:flow:stripe_seat_journey",
+                "test:tenancy/seat_limit.enforced.spec"
+              ]
+            },
+            {
+              "transition": "T2_R6",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:stripe_reconcile"
+              ]
+            },
+            {
+              "transition": "T2.8.0",
+              "state": "attested",
+              "refs": [
+                "manual:docs/v2/pricing/archetypes.md",
+                "manual:src/data/upgradeTriggers.ts",
+                "manual:src/data/pricingFeatures.ts#archetype"
+              ]
+            },
+            {
+              "transition": "T2.8.a",
+              "state": "attested",
+              "refs": [
+                "manual:supabase/functions/create-checkout-session/index.ts",
+                "manual:supabase/functions/_shared/validation.ts#validateCheckoutRequest",
+                "manual:supabase/functions/stripe-webhook/index.ts",
+                "manual:migration:profiles.seats",
+                "manual:src/pages/Pricing.tsx#EnterpriseSlider"
+              ]
+            },
+            {
+              "transition": "T2.8.b",
+              "state": "fired",
+              "refs": [
+                "manual:supabase/functions/schedule-seat-change/index.ts",
+                "manual:supabase/functions/customer-portal/index.ts#portal_configuration",
+                "manual:supabase/functions/stripe-webhook/index.ts#subscription_schedule",
+                "manual:migration:profiles.pending_seats",
+                "manual:src/pages/Settings.tsx#TeamSeats",
+                "test:validation/scheduleSeat"
+              ]
+            },
+            {
+              "transition": "T2.8.c",
+              "state": "fired",
+              "refs": [
+                "manual:migration:team_members.seat_status",
+                "manual:function:enforce_seat_limit",
+                "manual:view:team_seat_usage",
+                "manual:code:src/components/tenancy/TeamSeatsMembers.tsx",
+                "test:tenancy/seat_limit.enforced"
+              ]
+            },
+            {
+              "transition": "T2.8.d",
+              "state": "fired",
+              "refs": [
+                "manual:code:src/lib/upgradeNudge/engine.ts",
+                "manual:code:src/hooks/useUpgradeNudge.ts",
+                "manual:code:src/components/UpgradeNudgeBanner.tsx",
+                "manual:code:src/components/UpgradeNudgeToast.tsx",
+                "manual:code:src/pages/Pricing.tsx#UpgradeNudgeBanner",
+                "manual:code:src/pages/Projects.tsx#UpgradeNudgeBanner",
+                "manual:code:src/components/ImpulseCatcher.tsx#UpgradeNudgeBanner",
+                "test:upgradeNudge/engine",
+                "test:upgradeNudge/banner",
+                "test:upgradeNudge/toast"
+              ]
+            }
+          ]
+        },
+        "P_immutable_audit": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.9",
+              "state": "fired",
+              "refs": [
+                "manual:migration:audit_log",
+                "test:tenancy/audit.append_only.spec"
+              ]
+            },
+            {
+              "transition": "T2.9.a",
+              "state": "attested",
+              "refs": [
+                "manual:snapshot:rls-contract.latest.json#audit_log"
+              ]
+            },
+            {
+              "transition": "T2.9.b",
+              "state": "fired",
+              "refs": [
+                "test:tenancy/audit.append_only.spec"
+              ]
+            },
+            {
+              "transition": "T2.9.c",
+              "state": "attested",
+              "refs": [
+                "manual:code:src/lib/audit.ts"
+              ]
+            },
+            {
+              "transition": "T2.9.d",
+              "state": "attested",
+              "refs": [
+                "manual:code:src/components/admin/AuditTab.tsx"
+              ]
+            },
+            {
+              "transition": "T2.9.e",
+              "state": "fired",
+              "refs": [
+                "test:tenancy/audit.append_only"
+              ]
+            }
+          ]
+        },
+        "P_tenancy_observed": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.10",
+              "state": "fired",
+              "refs": [
+                "metric:fault_places_open"
+              ]
+            },
+            {
+              "transition": "T2_R7",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:regression_review"
+              ]
+            }
+          ]
+        },
+        "P_tenancy_ready": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.11",
+              "state": "fired",
+              "refs": [
+                "metric:fault_places_open"
+              ]
+            }
+          ]
+        },
+        "P_internal_tenancy_observed": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.10_A",
+              "state": "fired",
+              "refs": [
+                "manual:code:supabase/migrations/t2_10_a_observability",
+                "manual:code:supabase/functions/_shared/analyticsSchema.ts",
+                "manual:code:src/pages/admin/ObservabilityDiagnostics.tsx",
+                "test:src/lib/observability/__tests__/emitOperationalEvent.test.ts",
+                "test:src/lib/observability/__tests__/emitterCallSites.test.ts",
+                "test:supabase/functions/_shared/__tests__/analyticsSchema.test.ts",
+                "metric:docs/v2/petri/snapshots/observability-live-2026-07-17.json",
+                "flow:docs/v2/runbooks/t2_10_a_live_verify.md",
+                "metric:raw_payload_columns"
+              ]
+            },
+            {
+              "transition": "T2.10_A_sweep",
+              "state": "fired",
+              "refs": [
+                "metric:docs/v2/petri/snapshots/observability-live-2026-07-17.json",
+                "flow:docs/v2/runbooks/t2_10_a_live_verify.md"
+              ]
+            },
+            {
+              "transition": "T2_R10A_purge_orphans",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:sweep_operational_outbox"
+              ]
+            },
+            {
+              "transition": "T2_R10A_lock_writer",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:lock_outbox_writer"
+              ]
+            }
+          ]
+        },
+        "P_tenancy_health_aggregated": {
+          "fired": true,
+          "proofs": [
+            {
+              "transition": "T2.10_B",
+              "state": "fired",
+              "refs": [
+                "manual:code:supabase/functions/analytics-aggregator/index.ts",
+                "manual:code:supabase/functions/analytics-exporter/index.ts",
+                "test:observability/no_pii_contract.spec",
+                "test:observability/small_cell_suppression.spec",
+                "manual:runbook:posthog_retention_proof",
+                "metric:posthog_person_profiles_created"
+              ]
+            },
+            {
+              "transition": "T2_R10B_kill_switch",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:posthog_kill_switch"
+              ]
+            },
+            {
+              "transition": "T2_R10B_reset_lease",
+              "state": "attested",
+              "refs": [
+                "manual:runbook:reset_exporter_lease"
+              ]
+            }
+          ]
+        },
+        "P_lia_approved": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_retention_defined": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_aggregation_policy_approved": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_small_cell_controlled": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_posthog_dpa_signed": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_transfer_review_complete": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_posthog_retention_proven": {
+          "fired": false,
+          "proofs": []
+        },
+        "P_orphan_actor": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_leaked_secret": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_over_grant": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_missing_matrix_row": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_null_tenant_rows": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_seat_desync": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_regression_signal": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_policy_gap": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_raw_payload_stored": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_tenant_identifier_exported": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_person_profile_created": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_metric_duplicate_visible": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_event_unaccounted": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_small_cell_exposed": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_retention_unproven": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_deletion_unproven": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_transfer_configuration_invalid": {
+          "fired": false,
+          "faultPlace": true
+        },
+        "P_service_role_exposed": {
+          "fired": false,
+          "faultPlace": true
+        }
+      }
+    }
+  },
+  "faults": []
+}
