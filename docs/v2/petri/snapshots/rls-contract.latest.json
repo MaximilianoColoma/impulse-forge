@@ -1,0 +1,664 @@
+{
+  "generatedAt": "2026-07-15T18:44:40.117Z",
+  "tables": [
+    {
+      "tablename": "actor_credentials",
+      "rls": true
+    },
+    {
+      "tablename": "actors",
+      "rls": true
+    },
+    {
+      "tablename": "audit_log",
+      "rls": true
+    },
+    {
+      "tablename": "blueprint_feedback",
+      "rls": true
+    },
+    {
+      "tablename": "community_templates",
+      "rls": true
+    },
+    {
+      "tablename": "consent_status_options",
+      "rls": true
+    },
+    {
+      "tablename": "contact_status_options",
+      "rls": true
+    },
+    {
+      "tablename": "contacts",
+      "rls": true
+    },
+    {
+      "tablename": "impulse_history",
+      "rls": true
+    },
+    {
+      "tablename": "impulses",
+      "rls": true
+    },
+    {
+      "tablename": "profiles",
+      "rls": true
+    },
+    {
+      "tablename": "projects",
+      "rls": true
+    },
+    {
+      "tablename": "space_access",
+      "rls": true
+    },
+    {
+      "tablename": "spaces",
+      "rls": true
+    },
+    {
+      "tablename": "structure_snapshots",
+      "rls": true
+    },
+    {
+      "tablename": "structure_templates",
+      "rls": true
+    },
+    {
+      "tablename": "team_members",
+      "rls": true
+    },
+    {
+      "tablename": "teams",
+      "rls": true
+    },
+    {
+      "tablename": "unassigned_rows",
+      "rls": true
+    },
+    {
+      "tablename": "user_roles",
+      "rls": true
+    },
+    {
+      "tablename": "user_template_likes",
+      "rls": true
+    },
+    {
+      "tablename": "user_tools",
+      "rls": true
+    },
+    {
+      "tablename": "waitlist_subscribers",
+      "rls": true
+    }
+  ],
+  "policies": [
+    {
+      "tablename": "actor_credentials",
+      "policyname": "credentials owner insert",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM actors a\n  WHERE ((a.id = actor_credentials.actor_id) AND (a.user_id = auth.uid()))))"
+    },
+    {
+      "tablename": "actor_credentials",
+      "policyname": "credentials owner read",
+      "cmd": "SELECT",
+      "qual": "((EXISTS ( SELECT 1\n   FROM actors a\n  WHERE ((a.id = actor_credentials.actor_id) AND (a.user_id = auth.uid())))) OR has_role(auth.uid(), 'admin'::app_role))",
+      "with_check": ""
+    },
+    {
+      "tablename": "actor_credentials",
+      "policyname": "credentials owner revoke",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM actors a\n  WHERE ((a.id = actor_credentials.actor_id) AND (a.user_id = auth.uid()))))",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM actors a\n  WHERE ((a.id = actor_credentials.actor_id) AND (a.user_id = auth.uid()))))"
+    },
+    {
+      "tablename": "actors",
+      "policyname": "actors self insert",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "((user_id = auth.uid()) OR (kind = 'llm'::actor_kind))"
+    },
+    {
+      "tablename": "actors",
+      "policyname": "actors self read",
+      "cmd": "SELECT",
+      "qual": "((user_id = auth.uid()) OR has_role(auth.uid(), 'admin'::app_role) OR (EXISTS ( SELECT 1\n   FROM ((team_members tm1\n     JOIN team_members tm2 ON ((tm1.team_id = tm2.team_id)))\n     JOIN actors me ON ((me.id = tm1.actor_id)))\n  WHERE ((me.user_id = auth.uid()) AND (tm2.actor_id = actors.id)))))",
+      "with_check": ""
+    },
+    {
+      "tablename": "actors",
+      "policyname": "actors self update",
+      "cmd": "UPDATE",
+      "qual": "(user_id = auth.uid())",
+      "with_check": "(user_id = auth.uid())"
+    },
+    {
+      "tablename": "audit_log",
+      "policyname": "audit_log insert",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "((actor_id = current_actor_id()) OR (actor_id IS NULL))"
+    },
+    {
+      "tablename": "audit_log",
+      "policyname": "audit_log read own",
+      "cmd": "SELECT",
+      "qual": "((actor_id = current_actor_id()) OR ((team_id IS NOT NULL) AND is_team_member(team_id, 'admin'::team_role)) OR has_role(auth.uid(), 'admin'::app_role))",
+      "with_check": ""
+    },
+    {
+      "tablename": "blueprint_feedback",
+      "policyname": "Blueprint creators can view feedback for their templates",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM community_templates\n  WHERE ((community_templates.id = blueprint_feedback.template_id) AND (community_templates.creator_id = auth.uid()))))",
+      "with_check": ""
+    },
+    {
+      "tablename": "blueprint_feedback",
+      "policyname": "Users can create own feedback",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "blueprint_feedback",
+      "policyname": "Users can view own feedback",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "community_templates",
+      "policyname": "Community templates are viewable by everyone",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": ""
+    },
+    {
+      "tablename": "community_templates",
+      "policyname": "Users can create community templates",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "((auth.uid() = creator_id) OR (creator_id IS NULL))"
+    },
+    {
+      "tablename": "community_templates",
+      "policyname": "Users can delete own community templates",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = creator_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "community_templates",
+      "policyname": "Users can update own community templates",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = creator_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "consent_status_options",
+      "policyname": "Users can create own consent status options",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "consent_status_options",
+      "policyname": "Users can delete own consent status options",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "consent_status_options",
+      "policyname": "Users can view own consent status options",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "contact_status_options",
+      "policyname": "Users can create own contact status options",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "contact_status_options",
+      "policyname": "Users can delete own contact status options",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "contact_status_options",
+      "policyname": "Users can view own contact status options",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "contacts",
+      "policyname": "Users can create own contacts",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "contacts",
+      "policyname": "Users can delete own contacts",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "contacts",
+      "policyname": "Users can update own contacts",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "contacts",
+      "policyname": "Users can view own contacts",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "impulse_history",
+      "policyname": "Users can insert history of own impulses",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM impulses\n  WHERE ((impulses.id = impulse_history.impulse_id) AND (impulses.user_id = auth.uid()))))"
+    },
+    {
+      "tablename": "impulse_history",
+      "policyname": "Users can view history of own impulses",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM impulses\n  WHERE ((impulses.id = impulse_history.impulse_id) AND (impulses.user_id = auth.uid()))))",
+      "with_check": ""
+    },
+    {
+      "tablename": "impulses",
+      "policyname": "Users can create own impulses",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "impulses",
+      "policyname": "Users can delete own impulses",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "impulses",
+      "policyname": "Users can update own impulses",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "impulses",
+      "policyname": "Users can view own impulses",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "profiles",
+      "policyname": "Users can update own profile",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "profiles",
+      "policyname": "Users can view own profile",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "projects",
+      "policyname": "Users can create own projects",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "projects",
+      "policyname": "Users can delete own projects",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "projects",
+      "policyname": "Users can update own projects",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "projects",
+      "policyname": "Users can view own projects",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "space_access",
+      "policyname": "space_access admin manage",
+      "cmd": "ALL",
+      "qual": "has_space_access(space_id, 'admin'::space_permission)",
+      "with_check": "has_space_access(space_id, 'admin'::space_permission)"
+    },
+    {
+      "tablename": "space_access",
+      "policyname": "space_access read",
+      "cmd": "SELECT",
+      "qual": "((actor_id = current_actor_id()) OR has_space_access(space_id, 'admin'::space_permission))",
+      "with_check": ""
+    },
+    {
+      "tablename": "spaces",
+      "policyname": "spaces delete",
+      "cmd": "DELETE",
+      "qual": "(owner_actor_id = current_actor_id())",
+      "with_check": ""
+    },
+    {
+      "tablename": "spaces",
+      "policyname": "spaces insert",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "((owner_actor_id = current_actor_id()) AND ((team_id IS NULL) OR is_team_member(team_id, 'member'::team_role)))"
+    },
+    {
+      "tablename": "spaces",
+      "policyname": "spaces read",
+      "cmd": "SELECT",
+      "qual": "((owner_actor_id = current_actor_id()) OR (visibility = 'public'::space_visibility) OR ((visibility = 'team'::space_visibility) AND (team_id IS NOT NULL) AND is_team_member(team_id, 'viewer'::team_role)) OR (EXISTS ( SELECT 1\n   FROM space_access sa\n  WHERE ((sa.space_id = spaces.id) AND (sa.actor_id = current_actor_id())))) OR has_role(auth.uid(), 'admin'::app_role))",
+      "with_check": ""
+    },
+    {
+      "tablename": "spaces",
+      "policyname": "spaces update",
+      "cmd": "UPDATE",
+      "qual": "(has_space_access(id, 'admin'::space_permission) OR (owner_actor_id = current_actor_id()))",
+      "with_check": "(has_space_access(id, 'admin'::space_permission) OR (owner_actor_id = current_actor_id()))"
+    },
+    {
+      "tablename": "structure_snapshots",
+      "policyname": "Users can create own snapshots",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "structure_snapshots",
+      "policyname": "Users can delete own snapshots",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "structure_snapshots",
+      "policyname": "Users can view own snapshots",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "structure_templates",
+      "policyname": "Users can create own templates",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "structure_templates",
+      "policyname": "Users can delete own templates",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "structure_templates",
+      "policyname": "Users can update own templates",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "structure_templates",
+      "policyname": "Users can view own templates",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "team_members",
+      "policyname": "team_members admin manage",
+      "cmd": "ALL",
+      "qual": "is_team_member(team_id, 'admin'::team_role)",
+      "with_check": "is_team_member(team_id, 'admin'::team_role)"
+    },
+    {
+      "tablename": "team_members",
+      "policyname": "team_members read",
+      "cmd": "SELECT",
+      "qual": "(is_team_member(team_id, 'viewer'::team_role) OR has_role(auth.uid(), 'admin'::app_role))",
+      "with_check": ""
+    },
+    {
+      "tablename": "teams",
+      "policyname": "teams admin update",
+      "cmd": "UPDATE",
+      "qual": "is_team_member(id, 'admin'::team_role)",
+      "with_check": "is_team_member(id, 'admin'::team_role)"
+    },
+    {
+      "tablename": "teams",
+      "policyname": "teams member read",
+      "cmd": "SELECT",
+      "qual": "(is_team_member(id, 'viewer'::team_role) OR has_role(auth.uid(), 'admin'::app_role))",
+      "with_check": ""
+    },
+    {
+      "tablename": "teams",
+      "policyname": "teams owner delete",
+      "cmd": "DELETE",
+      "qual": "is_team_member(id, 'owner'::team_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "teams",
+      "policyname": "teams owner insert",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(owner_actor_id = current_actor_id())"
+    },
+    {
+      "tablename": "unassigned_rows",
+      "policyname": "unassigned admin read",
+      "cmd": "SELECT",
+      "qual": "has_role(auth.uid(), 'admin'::app_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "Admins can delete roles",
+      "cmd": "DELETE",
+      "qual": "has_role(auth.uid(), 'admin'::app_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "Admins can insert roles",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "has_role(auth.uid(), 'admin'::app_role)"
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "Admins can update roles",
+      "cmd": "UPDATE",
+      "qual": "has_role(auth.uid(), 'admin'::app_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "Admins can view all roles",
+      "cmd": "SELECT",
+      "qual": "has_role(auth.uid(), 'admin'::app_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "Users can view their own roles",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_template_likes",
+      "policyname": "Likes are viewable by everyone",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_template_likes",
+      "policyname": "Users can create own likes",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "user_template_likes",
+      "policyname": "Users can delete own likes",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_tools",
+      "policyname": "Users can create own tools",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "tablename": "user_tools",
+      "policyname": "Users can delete own tools",
+      "cmd": "DELETE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "user_tools",
+      "policyname": "Users can view own tools",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": ""
+    },
+    {
+      "tablename": "waitlist_subscribers",
+      "policyname": "Admins can view waitlist",
+      "cmd": "SELECT",
+      "qual": "has_role(auth.uid(), 'admin'::app_role)",
+      "with_check": ""
+    },
+    {
+      "tablename": "waitlist_subscribers",
+      "policyname": "Anyone can count waitlist subscribers",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": ""
+    },
+    {
+      "tablename": "waitlist_subscribers",
+      "policyname": "Anyone can subscribe to waitlist",
+      "cmd": "INSERT",
+      "qual": "",
+      "with_check": "true"
+    }
+  ],
+  "tenancyColumns": {
+    "actor_credentials": [
+      "actor_id"
+    ],
+    "actors": [
+      "user_id"
+    ],
+    "audit_log": [
+      "actor_id",
+      "space_id",
+      "team_id"
+    ],
+    "blueprint_feedback": [
+      "space_id",
+      "user_id"
+    ],
+    "community_templates": [
+      "space_id"
+    ],
+    "consent_status_options": [
+      "user_id"
+    ],
+    "contact_status_options": [
+      "user_id"
+    ],
+    "contacts": [
+      "space_id",
+      "user_id"
+    ],
+    "impulses": [
+      "space_id",
+      "user_id"
+    ],
+    "projects": [
+      "space_id",
+      "user_id"
+    ],
+    "space_access": [
+      "actor_id",
+      "space_id"
+    ],
+    "spaces": [
+      "team_id"
+    ],
+    "structure_snapshots": [
+      "space_id",
+      "user_id"
+    ],
+    "structure_templates": [
+      "space_id",
+      "user_id"
+    ],
+    "team_members": [
+      "actor_id",
+      "team_id"
+    ],
+    "user_roles": [
+      "user_id"
+    ],
+    "user_template_likes": [
+      "user_id"
+    ],
+    "user_tools": [
+      "space_id",
+      "user_id"
+    ]
+  },
+  "hash": "62e8c3c9c700"
+}
