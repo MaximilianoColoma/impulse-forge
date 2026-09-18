@@ -1,0 +1,12 @@
+# Optional periodic re-deploy on a schedule (e.g. nightly or hourly).
+# OnCalendar default in this file is illustrative — adjust to your cadence.
+[Unit]
+Description=Periodically rebuild Synapse from GitHub main
+Requires=synapse-build.service
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

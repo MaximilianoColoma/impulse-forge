@@ -1,0 +1,30 @@
+# Synapse — one-shot build+publish unit.
+#
+# Runs deploy/deploy-build.sh once (pull main -> npm build -> atomically
+# publish -> reload nginx). Enable with:
+#   systemctl enable synapse-build.service   (and optionally the timer)
+# Trigger manually: systemctl start synapse-build.service
+#
+# The service runs as the dedicated `synapse` system user. Its env file
+# /srv/synapse/.env.production holds the real (non-committed) Supabase/Stripe
+# build values.
+[Unit]
+Description=Build and publish Synapse SPA from GitHub main
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=synapse
+Group=synapse
+StateDirectory=synapse
+WorkingDirectory=/srv/synapse
+ExecStart=/srv/synapse/deploy-build.sh
+# Security hardening for a build job that only reads the repo + env and writes dist.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
