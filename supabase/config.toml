@@ -1,0 +1,55 @@
+project_id = "qxcjvplihrocexptbchr"
+
+[functions.generate-tags]
+verify_jwt = false
+
+[functions.optimize-structure]
+verify_jwt = true
+
+[functions.publish-blueprint]
+verify_jwt = true
+
+[functions.apply-blueprint]
+verify_jwt = true
+
+[functions.get-fingerprint]
+verify_jwt = true
+
+[functions.semantic-search]
+verify_jwt = true
+
+[functions.get-user-activity-status]
+verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.export-impulses]
+verify_jwt = false
+
+[functions.rank-projects]
+verify_jwt = true
+
+[functions.prioritize-tasks]
+verify_jwt = true
+
+[functions.create-api-token]
+verify_jwt = true
+
+[functions.create-impulse-api]
+verify_jwt = false
+
+[functions.analyze-patterns]
+verify_jwt = true
+
+[functions.brainstorm-structure]
+verify_jwt = true
+
+[functions.move-projects]
+verify_jwt = true
+
+[functions.evolve-blueprint]
+verify_jwt = true

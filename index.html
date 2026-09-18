@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Synapse — Dein Second Brain für ADHS</title>
+    <meta name="description" content="Verwandle dein ADHS in deine Superkraft. Erfasse Gedanken sofort und mache aus Chaos Klarheit." />
+    <meta name="author" content="Synapse" />
+    <meta name="referrer" content="no-referrer" />
+    <script id="auth-url-scrub">
+      (() => {
+        const url = new URL(window.location.href);
+        let changed = false;
+        for (const name of ['access_token', 'refresh_token', 'token', 'token_hash']) {
+          if (url.searchParams.has(name)) {
+            url.searchParams.delete(name);
+            changed = true;
+          }
+        }
+        if (changed) {
+          window.history.replaceState(
+            window.history.state,
+            '',
+            `${url.pathname}${url.search}${url.hash}`,
+          );
+        }
+      })();
+    </script>
+    
+    <!-- Critical CSS for preventing black screen flash -->
+    <style>
+      :root {
+        --background: 222 47% 5%;
+        --foreground: 214 30% 91%;
+        --primary: 188 100% 50%;
+      }
+      html, body {
+        background-color: hsl(222 47% 5%);
+        color: hsl(214 30% 91%);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+      #root {
+        background-color: hsl(222 47% 5%);
+        min-height: 100vh;
+      }
+      /* Initial loader while React loads */
+      #initial-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: hsl(222 47% 5%);
+      }
+      #initial-loader .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid hsl(214 30% 91% / 0.2);
+        border-top-color: hsl(188 100% 50%);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0A0E1A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <meta property="og:title" content="Synapse — Dein Second Brain für ADHS" />
+    <meta property="og:description" content="Verwandle dein ADHS in deine Superkraft. Erfasse Gedanken sofort und mache aus Chaos Klarheit." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icon.svg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/icon.svg" />
+  </head>
+
+  <body>
+    <div id="root">
+      <div id="initial-loader">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
