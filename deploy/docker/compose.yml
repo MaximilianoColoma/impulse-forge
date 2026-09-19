@@ -1,0 +1,33 @@
+# Synapse production on the owner's VPS, behind the existing Cloudflare tunnel.
+#
+# The container joins the shared buzz-prod_buzz-net network (external, created
+# by /opt/buzz/compose.yml) so the running cloudflared tunnel can reach it by
+# the service name "synapse" (origin http://synapse:8080) for hostname
+# synapse.billionex.io, exactly like it reaches relay/pair-relay.
+#
+# Build env (VITE_*) is read from /opt/synapse/.env by the wrapper script,
+# never baked into the repo or this file.
+
+services:
+  synapse:
+    build:
+      context: /opt/synapse/repo
+      dockerfile: Dockerfile
+      args:
+        VITE_APP_ENV: ${VITE_APP_ENV:-production}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_PROJECT_ID: ${VITE_SUPABASE_PROJECT_ID:-}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY:-}
+        VITE_BILLING_ENABLED: ${VITE_BILLING_ENABLED:-false}
+    image: synapse-prod:latest
+    restart: unless-stopped
+    networks:
+      - buzz-net
+    # No host ports published: the tunnel reaches the container by name/port 8080.
+    expose:
+      - "8080"
+
+networks:
+  buzz-net:
+    external: true
+    name: buzz-prod_buzz-net
